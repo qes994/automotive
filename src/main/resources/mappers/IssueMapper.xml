@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybaits.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="edu.wandongli.car.dao.IssueDao">
+   <resultMap id="IssueResult" type="issue">
+       <id property="id" column="id"></id>
+       <result property="userId" column="user_id"></result>
+       <result property="brand" column="brand"></result>
+       <result property="arctic" column="arctic"></result>
+       <result property="title" column="title"></result>
+       <result property="digest" column="digest"></result>
+       <result property="priority" column="priority"></result>
+       <result property="price" column="price"></result>
+       <result property="ceilingPrice" column="ceiling_price"></result>
+       <result property="floorPrice" column="floor_price"></result>
+       <result property="shop" column="shop" typeHandler="edu.wandongli.car.typehandler.ShopTypeHandler"></result>
+       <result property="status" column="status" typeHandler="edu.wandongli.car.typehandler.StatusTypeHandler"></result>
+       <result property="createTime" column="create_time"></result>
+       <result property="updateTime" column="update_time"></result>
+       <association property="user" column="user_id" select="edu.wandongli.car.dao.UserDao.findUserById"></association>
+       <collection property="issuePrints" column="id" select="edu.wandongli.car.dao.IssuePrintDao.selectByIssueId"></collection>
+   </resultMap>
+    <sql id="Issue_List">
+       id,user_id,brand,arctic,title,details,digest,priority,price,shop,status,create_time,update_time,ceiling_price,floor_price
+   </sql>
+    <select id="findIssuesByUserIdAndStatus" resultMap="IssueResult">
+        select <include refid="Issue_List"/> from  issue
+        where user_id=#{userId} and status=1 order by priority desc
+    </select>
+    <select id="getList" resultMap="IssueResult" parameterType="issue">
+    select <include refid="Issue_List"/> from issue
+    <where>
+        <if test="shop!=null">
+            and shop=#{shop}
+        </if>
+        <if test="brand!=null and brand!=''">
+            and brand = #{brand}
+        </if>
+
+        <if test="arctic!=null and arctic!=''">
+            and arctic=#{arctic}
+        </if>
+        <if test="price!=null and price!=0">
+            and   price=#{price}
+        </if>
+        <if test="ceilingPrice==10 and floorPrice==0">
+            and price  &lt;= 10
+        </if>
+        <if test="floorPrice!=null and floorPrice!=0 and ceilingPrice!=null and ceilingPrice!=0">
+            and price between #{floorPrice} and #{ceilingPrice}
+        </if>
+        and status =1
+    </where>
+    order by priority desc
+</select>
+    <select id="getListByLikes" resultMap="IssueResult">
+        select <include refid="Issue_List"/> from issue
+        <where>
+            <if test="title!=null and title!=''">
+                and title like concat('%',#{title},'%')
+            </if>
+            <if test="shop!=null">
+                and shop like concat('%',#{shop},'%')
+            </if>
+            <if test="brand!=null and brand!=''">
+                and brand like concat('%',#{brand},'%')
+            </if>
+            <if test="arctic!=null and arctic!=''">
+                and arctic like concat('%',#{arctic},'%')
+            </if>
+            <if test="ceilingPrice==10 and floorPrice==0">
+                 and price  &lt;= 10
+            </if>
+            <if test="floorPrice!=null and floorPrice!=0 and ceilingPrice!=null and ceilingPrice!=0">
+                and price between #{floorPrice} and #{ceilingPrice}
+            </if>
+        </where>
+    </select>
+</mapper>

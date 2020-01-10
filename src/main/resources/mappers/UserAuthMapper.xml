@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybaits.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="edu.wandongli.car.dao.UserAuthDao">
+   <resultMap id="UserAuthResult" type="userAuth">
+       <id property="id" column="id"></id>
+       <result property="userId" column="user_id"></result>
+       <result property="name" column="name"></result>
+       <result property="frontImage" column="front_image"></result>
+       <result property="backImage" column="back_image"></result>
+       <result property="idCard" column="id_card"></result>
+       <result property="status" column="status" typeHandler="edu.wandongli.car.typehandler.RealTypeHandler"></result>
+       <result property="createTime" column="create_time"></result>
+       <result property="updateTime" column="update_time"></result>
+   </resultMap>
+   <sql id="UserAuth_List">
+       id,user_id,name,front_image,back_image,id_card,status,create_time,update_time
+   </sql>
+    <select id="findAuthByUserId" resultMap="UserAuthResult" parameterType="long">
+        select <include refid="UserAuth_List"/> from user_auth
+        where user_id=#{userId}
+    </select>
+</mapper>

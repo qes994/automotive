@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybaits.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="edu.wandongli.car.dao.AdminDao">
+   <resultMap id="AdminResult" type="admin">
+       <id property="id" column="id"></id>
+       <result property="password" column="password"></result>
+       <result property="phone" column="phone"></result>
+       <result property="head" column="head"></result>
+       <result property="createTime" column="create_time"></result>
+       <result property="updateTime" column="update_time"></result>
+       <result property="name" column="name"></result>
+       <collection property="permission" ofType="permission">
+           <id column="pid" property="id"></id>
+           <result column="pname" property="name"></result>
+           <result column="purl" property="url"></result>
+       </collection>
+       <collection property="role" ofType="role">
+           <id column="rid" property="id"></id>
+           <result column="rname" property="name"></result>
+       </collection>
+   </resultMap>
+    <!--a.id,a.name,a.phone,a.head,a.create_time,a.update_time,
+p.id,p.name,p.url,
+r.id,r.role-->
+    <select id="getList" resultMap="AdminResult" parameterType="string">
+select a.id,a.name,a.phone,
+p.id pid,p.name pname,p.url purl,r.name rname,r.id rid
+from admin a
+inner join admin_role ar on a.id=ar.admin_id
+inner join role r on r.id = ar.role_id
+inner join role_permission rp on r.id = rp.role_id
+inner join permission p on p.id = rp.permission_id
+where a.phone = #{phone}
+    </select>
+</mapper>
